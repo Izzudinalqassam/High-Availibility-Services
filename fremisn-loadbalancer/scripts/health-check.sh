@@ -237,7 +237,8 @@ check_fremisn_servers() {
     
     local servers=(
         "Fremisn Master:http://$FREMISN_MASTER"
-        "Fremisn Slave:http://$FREMISN_SLAVE"
+        "Fremisn Slave 1:http://$FREMISN_SLAVE"
+        "Fremisn Slave 2:http://192.168.100.17:4009"
     )
     
     for server in "${servers[@]}"; do

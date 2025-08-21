@@ -36,7 +36,8 @@ BLACKBOX_URL="http://localhost:9115"
 
 # Fremisn servers
 FREMISN_MASTER="${FREMISN_MASTER_HOST:-192.168.100.231}:${FREMISN_MASTER_PORT:-4005}"
-FREMISN_SLAVE="${FREMISN_SLAVE_HOST:-192.168.100.18}:${FREMISN_SLAVE_PORT:-4008}"
+FREMISN_SLAVE1="${FREMISN_SLAVE1_HOST:-192.168.100.18}:${FREMISN_SLAVE1_PORT:-4008}"
+FREMISN_SLAVE2="${FREMISN_SLAVE2_HOST:-192.168.100.17}:${FREMISN_SLAVE2_PORT:-4009}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -69,7 +70,8 @@ init_metrics() {
     RESPONSE_TIMES["nginx_status"]=0
     RESPONSE_TIMES["blackbox"]=0
     RESPONSE_TIMES["fremisn_master"]=0
-    RESPONSE_TIMES["fremisn_slave"]=0
+    RESPONSE_TIMES["fremisn_slave1"]=0
+    RESPONSE_TIMES["fremisn_slave2"]=0
     
     SERVICE_STATUS["nginx-lb"]="unknown"
     SERVICE_STATUS["prometheus"]="unknown"
@@ -293,22 +295,41 @@ check_endpoints() {
         ((ALERT_COUNTS["service_down"]++))
     fi
     
-    # Fremisn Slave
-    result=$(measure_response_time "http://$FREMISN_SLAVE/health")
-    RESPONSE_TIMES["fremisn_slave"]="${result%%:*}"
+    # Fremisn Slave 1
+    result=$(measure_response_time "http://$FREMISN_SLAVE1/health")
+    RESPONSE_TIMES["fremisn_slave1"]="${result%%:*}"
     status_code="${result##*:}"
     
     if [[ "$status_code" == "000" ]]; then
         # Try root endpoint
-        result=$(measure_response_time "http://$FREMISN_SLAVE")
+        result=$(measure_response_time "http://$FREMISN_SLAVE1")
         status_code="${result##*:}"
     fi
     
     if [[ "$status_code" != "000" ]]; then
-        SERVICE_STATUS["fremisn_slave"]="reachable"
+        SERVICE_STATUS["fremisn_slave1"]="reachable"
     else
-        SERVICE_STATUS["fremisn_slave"]="unreachable"
-        log_alert "WARNING" "Fremisn Slave is unreachable"
+        SERVICE_STATUS["fremisn_slave1"]="unreachable"
+        log_alert "WARNING" "Fremisn Slave 1 is unreachable"
+        ((ALERT_COUNTS["service_down"]++))
+    fi
+    
+    # Fremisn Slave 2
+    result=$(measure_response_time "http://$FREMISN_SLAVE2/health")
+    RESPONSE_TIMES["fremisn_slave2"]="${result%%:*}"
+    status_code="${result##*:}"
+    
+    if [[ "$status_code" == "000" ]]; then
+        # Try root endpoint
+        result=$(measure_response_time "http://$FREMISN_SLAVE2")
+        status_code="${result##*:}"
+    fi
+    
+    if [[ "$status_code" != "000" ]]; then
+        SERVICE_STATUS["fremisn_slave2"]="reachable"
+    else
+        SERVICE_STATUS["fremisn_slave2"]="unreachable"
+        log_alert "WARNING" "Fremisn Slave 2 is unreachable"
         ((ALERT_COUNTS["service_down"]++))
     fi
     
@@ -460,7 +481,8 @@ display_dashboard() {
         "nginx_status:Nginx Status"
         "blackbox:Blackbox Exp"
         "fremisn_master:Fremisn Master"
-        "fremisn_slave:Fremisn Slave"
+        "fremisn_slave1:Fremisn Slave 1"
+        "fremisn_slave2:Fremisn Slave 2"
     )
     
     for endpoint in "${endpoints[@]}"; do
@@ -692,9 +714,11 @@ case "${1:-}" in
         echo "  SLACK_WEBHOOK_URL           Slack webhook URL for alerts"
         echo "  EMAIL_ALERTS                Email address for alerts"
         echo "  FREMISN_MASTER_HOST         Fremisn master server IP"
-        echo "  FREMISN_MASTER_PORT         Fremisn master server port"
-        echo "  FREMISN_SLAVE_HOST          Fremisn slave server IP"
-        echo "  FREMISN_SLAVE_PORT          Fremisn slave server port"
+         echo "  FREMISN_MASTER_PORT         Fremisn master server port"
+        echo "  FREMISN_SLAVE1_HOST         Fremisn slave 1 server IP"
+        echo "  FREMISN_SLAVE1_PORT         Fremisn slave 1 server port"
+        echo "  FREMISN_SLAVE2_HOST         Fremisn slave 2 server IP"
+        echo "  FREMISN_SLAVE2_PORT         Fremisn slave 2 server port"
         echo "  VERBOSE                     Enable verbose output (true/false)"
         echo "  DASHBOARD_MODE              Enable dashboard mode (true/false)"
         echo

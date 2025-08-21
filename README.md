@@ -24,13 +24,21 @@
 ### 🏗️ Arsitektur Sistem
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Load Balancer │────│  Fremisn Master  │    │  Fremisn Slave  │
-│   (Nginx)       │    │  192.168.100.231 │    │  192.168.100.18 │
-│   Port: 8081    │    │  Port: 4005      │    │  Port: 4008     │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-         │
-         ▼
+                    ┌──────────────────┐
+                    │   Load Balancer  │
+                    │   (Nginx)        │
+                    │   Port: 8081     │
+                    └─────────┬────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+              ▼               ▼               ▼
+    ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+    │ Fremisn Master  │ │ Fremisn Slave 1 │ │ Fremisn Slave 2 │
+    │ 192.168.100.231 │ │ 192.168.100.18  │ │ 192.168.100.17  │
+    │ Port: 4005      │ │ Port: 4008      │ │ Port: 4009      │
+    └─────────────────┘ └─────────────────┘ └─────────────────┘
+
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   Prometheus    │────│  Blackbox        │    │   Grafana       │
 │   Port: 9090    │    │  Exporter        │    │   Port: 3000    │
@@ -57,16 +65,35 @@
 upstream fremisn_backend {
     # Ganti IP dan port sesuai dengan server Anda
     server 192.168.100.231:4005 max_conns=1;  # Fremisn Master
-    server 192.168.100.18:4008 max_conns=1;   # Fremisn Slave
+    server 192.168.100.18:4008 max_conns=1;   # Fremisn Slave 1
+    server 192.168.100.17:4009 max_conns=1;   # Fremisn Slave 2
     
     keepalive 32;
 }
 ```
 
+### Fremisn Servers
+- **Master Server**: 192.168.100.231:4005
+- **Slave Server 1**: 192.168.100.18:4008
+- **Slave Server 2**: 192.168.100.17:4009
+
+### Environment Variables
+```
+# Fremisn Server Configuration
+FREMISN_MASTER_HOST=192.168.100.231
+FREMISN_MASTER_PORT=4005
+FREMISN_SLAVE1_HOST=192.168.100.18
+FREMISN_SLAVE1_PORT=4008
+FREMISN_SLAVE2_HOST=192.168.100.17
+FREMISN_SLAVE2_PORT=4009
+```
+
 **Penjelasan**:
 - `192.168.100.231:4005`: IP dan port server Fremisn Master
-- `192.168.100.18:4008`: IP dan port server Fremisn Slave
+- `192.168.100.18:4008`: IP dan port server Fremisn Slave 1
+- `192.168.100.17:4009`: IP dan port server Fremisn Slave 2
 - `max_conns=1`: Maksimal 1 koneksi concurrent per server
+- Load balancing menggunakan algoritma **round-robin** untuk mendistribusikan traffic secara merata ke ketiga server
 - Tambahkan server baru dengan format yang sama
 
 ### 2. Konfigurasi Monitoring Targets
@@ -79,7 +106,8 @@ upstream fremisn_backend {
   static_configs:
     - targets:
       - http://192.168.100.231:4005   # Fremisn Master
-      - http://192.168.100.18:4008    # Fremisn Slave
+      - http://192.168.100.18:4008    # Fremisn Slave 1
+      - http://192.168.100.17:4009    # Fremisn Slave 2
 ```
 
 **Penjelasan**:

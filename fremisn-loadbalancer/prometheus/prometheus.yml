@@ -23,11 +23,12 @@ scrape_configs:
   - job_name: 'blackbox'
     metrics_path: /probe
     params:
-      module: [fremisn_check]  # Use custom module that accepts 404
+      module: [fremisn_check]  # Use custom module that accepts 404- job_name: 'blackbox'
     static_configs:
       - targets:
         - http://192.168.100.231:4005   # Fremisn Master
-        - http://192.168.100.18:4008    # Fremisn Slave 
+        - http://192.168.100.18:4008    # Fremisn Slave 1
+        - http://192.168.100.17:4009    # Fremisn Slave 2 
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
