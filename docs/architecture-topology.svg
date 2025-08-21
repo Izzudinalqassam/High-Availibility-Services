@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #2c3e50; }
+      .subtitle { font-family: Arial, sans-serif; font-size: 16px; fill: #34495e; }
+      .component-title { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #2c3e50; }
+      .component-text { font-family: Arial, sans-serif; font-size: 12px; fill: #2c3e50; }
+      .port-text { font-family: Arial, sans-serif; font-size: 10px; fill: #7f8c8d; }
+      .flow-text { font-family: Arial, sans-serif; font-size: 11px; fill: #e74c3c; font-weight: bold; }
+      .zone-text { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #8e44ad; }
+      
+      .client-box { fill: #3498db; stroke: #2980b9; stroke-width: 2; }
+      .lb-box { fill: #e67e22; stroke: #d35400; stroke-width: 2; }
+      .server-box { fill: #27ae60; stroke: #229954; stroke-width: 2; }
+      .monitor-box { fill: #9b59b6; stroke: #8e44ad; stroke-width: 2; }
+      .storage-box { fill: #f39c12; stroke: #e67e22; stroke-width: 2; }
+      
+      .flow-arrow { stroke: #e74c3c; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .data-flow { stroke: #3498db; stroke-width: 1.5; fill: none; stroke-dasharray: 5,5; marker-end: url(#arrowhead-blue); }
+      .monitor-flow { stroke: #9b59b6; stroke-width: 1.5; fill: none; stroke-dasharray: 3,3; marker-end: url(#arrowhead-purple); }
+      
+      .zone-border { fill: none; stroke: #bdc3c7; stroke-width: 2; stroke-dasharray: 10,5; }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+    </marker>
+    
+    <marker id="arrowhead-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#3498db" />
+    </marker>
+    
+    <marker id="arrowhead-purple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#9b59b6" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#ecf0f1"/>
+  
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" class="title">High Availability Fremisn Services - Architecture Topology</text>
+  <text x="600" y="55" text-anchor="middle" class="subtitle">Load Balancing & Monitoring Infrastructure</text>
+  
+  <!-- Zone Labels -->
+  <text x="100" y="100" class="zone-text">Client Zone</text>
+  <text x="100" y="250" class="zone-text">Load Balancer Zone</text>
+  <text x="100" y="400" class="zone-text">Application Zone</text>
+  <text x="100" y="600" class="zone-text">Monitoring Zone</text>
+  
+  <!-- Zone Borders -->
+  <rect x="80" y="110" width="1040" height="120" class="zone-border"/>
+  <rect x="80" y="260" width="1040" height="120" class="zone-border"/>
+  <rect x="80" y="410" width="1040" height="170" class="zone-border"/>
+  <rect x="80" y="610" width="1040" height="150" class="zone-border"/>
+  
+  <!-- Client/User -->
+  <rect x="500" y="140" width="200" height="60" rx="10" class="client-box"/>
+  <text x="600" y="160" text-anchor="middle" class="component-title">External Clients</text>
+  <text x="600" y="175" text-anchor="middle" class="component-text">Web Browsers, Mobile Apps</text>
+  <text x="600" y="190" text-anchor="middle" class="component-text">API Consumers</text>
+  
+  <!-- Load Balancer (Nginx) -->
+  <rect x="450" y="290" width="300" height="60" rx="10" class="lb-box"/>
+  <text x="600" y="310" text-anchor="middle" class="component-title">Nginx Load Balancer</text>
+  <text x="600" y="325" text-anchor="middle" class="component-text">Round-Robin Algorithm</text>
+  <text x="600" y="340" text-anchor="middle" class="port-text">Port: 8081 (Main) | 8080 (Status)</text>
+  
+  <!-- Fremisn Servers -->
+  <!-- Master Server -->
+  <rect x="200" y="440" width="180" height="80" rx="10" class="server-box"/>
+  <text x="290" y="460" text-anchor="middle" class="component-title">Fremisn Master</text>
+  <text x="290" y="475" text-anchor="middle" class="component-text">192.168.100.231</text>
+  <text x="290" y="490" text-anchor="middle" class="port-text">Port: 4005</text>
+  <text x="290" y="505" text-anchor="middle" class="component-text">Primary Instance</text>
+  
+  <!-- Slave Server 1 -->
+  <rect x="420" y="440" width="180" height="80" rx="10" class="server-box"/>
+  <text x="510" y="460" text-anchor="middle" class="component-title">Fremisn Slave 1</text>
+  <text x="510" y="475" text-anchor="middle" class="component-text">192.168.100.18</text>
+  <text x="510" y="490" text-anchor="middle" class="port-text">Port: 4008</text>
+  <text x="510" y="505" text-anchor="middle" class="component-text">Replica Instance</text>
+  
+  <!-- Slave Server 2 -->
+  <rect x="640" y="440" width="180" height="80" rx="10" class="server-box"/>
+  <text x="730" y="460" text-anchor="middle" class="component-title">Fremisn Slave 2</text>
+  <text x="730" y="475" text-anchor="middle" class="component-text">192.168.100.17</text>
+  <text x="730" y="490" text-anchor="middle" class="port-text">Port: 4009</text>
+  <text x="730" y="505" text-anchor="middle" class="component-text">Replica Instance</text>
+  
+  <!-- Monitoring Components -->
+  <!-- Prometheus -->
+  <rect x="150" y="640" width="160" height="80" rx="10" class="monitor-box"/>
+  <text x="230" y="660" text-anchor="middle" class="component-title">Prometheus</text>
+  <text x="230" y="675" text-anchor="middle" class="component-text">Metrics Collection</text>
+  <text x="230" y="690" text-anchor="middle" class="port-text">Port: 9090</text>
+  <text x="230" y="705" text-anchor="middle" class="component-text">Time Series DB</text>
+  
+  <!-- Blackbox Exporter -->
+  <rect x="340" y="640" width="160" height="80" rx="10" class="monitor-box"/>
+  <text x="420" y="660" text-anchor="middle" class="component-title">Blackbox Exporter</text>
+  <text x="420" y="675" text-anchor="middle" class="component-text">Health Checks</text>
+  <text x="420" y="690" text-anchor="middle" class="port-text">Port: 9115</text>
+  <text x="420" y="705" text-anchor="middle" class="component-text">HTTP Probes</text>
+  
+  <!-- Grafana -->
+  <rect x="530" y="640" width="160" height="80" rx="10" class="monitor-box"/>
+  <text x="610" y="660" text-anchor="middle" class="component-title">Grafana</text>
+  <text x="610" y="675" text-anchor="middle" class="component-text">Visualization</text>
+  <text x="610" y="690" text-anchor="middle" class="port-text">Port: 3000</text>
+  <text x="610" y="705" text-anchor="middle" class="component-text">Dashboards</text>
+  
+  <!-- Storage -->
+  <rect x="720" y="640" width="160" height="80" rx="10" class="storage-box"/>
+  <text x="800" y="660" text-anchor="middle" class="component-title">Persistent Storage</text>
+  <text x="800" y="675" text-anchor="middle" class="component-text">Docker Volumes</text>
+  <text x="800" y="690" text-anchor="middle" class="component-text">Metrics Data</text>
+  <text x="800" y="705" text-anchor="middle" class="component-text">Dashboard Config</text>
+  
+  <!-- Docker Container Indicator -->
+  <rect x="900" y="640" width="160" height="80" rx="10" class="storage-box"/>
+  <text x="980" y="660" text-anchor="middle" class="component-title">Docker Engine</text>
+  <text x="980" y="675" text-anchor="middle" class="component-text">Container Runtime</text>
+  <text x="980" y="690" text-anchor="middle" class="component-text">Docker Compose</text>
+  <text x="980" y="705" text-anchor="middle" class="component-text">Orchestration</text>
+  
+  <!-- Traffic Flow Arrows -->
+  <!-- Client to Load Balancer -->
+  <line x1="600" y1="200" x2="600" y2="290" class="flow-arrow"/>
+  <text x="620" y="245" class="flow-text">HTTP/HTTPS</text>
+  
+  <!-- Load Balancer to Servers -->
+  <line x1="550" y1="350" x2="290" y2="440" class="flow-arrow"/>
+  <line x1="600" y1="350" x2="510" y2="440" class="flow-arrow"/>
+  <line x1="650" y1="350" x2="730" y2="440" class="flow-arrow"/>
+  
+  <text x="400" y="395" class="flow-text">Round-Robin</text>
+  <text x="550" y="395" class="flow-text">Distribution</text>
+  
+  <!-- Monitoring Data Flows -->
+  <!-- Blackbox to Servers -->
+  <line x1="420" y1="640" x2="290" y2="520" class="monitor-flow"/>
+  <line x1="420" y1="640" x2="510" y2="520" class="monitor-flow"/>
+  <line x1="420" y1="640" x2="730" y2="520" class="monitor-flow"/>
+  
+  <!-- Blackbox to Prometheus -->
+  <line x1="340" y1="680" x2="310" y2="680" class="data-flow"/>
+  
+  <!-- Prometheus to Grafana -->
+  <line x1="310" y1="680" x2="530" y2="680" class="data-flow"/>
+  
+  <!-- Storage connections -->
+  <line x1="690" y1="680" x2="720" y2="680" class="data-flow"/>
+  <line x1="310" y1="680" x2="720" y2="680" class="data-flow" stroke-dasharray="2,2"/>
+  
+  <!-- Load Balancer Status Monitoring -->
+  <line x1="600" y1="350" x2="420" y2="640" class="monitor-flow"/>
+  
+  <!-- Legend -->
+  <g transform="translate(850, 120)">
+    <rect x="0" y="0" width="250" height="200" fill="white" stroke="#bdc3c7" stroke-width="1" rx="5"/>
+    <text x="125" y="20" text-anchor="middle" class="component-title">Legend</text>
+    
+    <!-- Traffic Flow -->
+    <line x1="10" y1="40" x2="40" y2="40" class="flow-arrow"/>
+    <text x="50" y="45" class="component-text">Application Traffic</text>
+    
+    <!-- Data Flow -->
+    <line x1="10" y1="60" x2="40" y2="60" class="data-flow"/>
+    <text x="50" y="65" class="component-text">Metrics Data Flow</text>
+    
+    <!-- Monitor Flow -->
+    <line x1="10" y1="80" x2="40" y2="80" class="monitor-flow"/>
+    <text x="50" y="85" class="component-text">Health Check Probes</text>
+    
+    <!-- Component Types -->
+    <rect x="10" y="100" width="20" height="15" class="client-box"/>
+    <text x="40" y="112" class="component-text">Client Layer</text>
+    
+    <rect x="10" y="120" width="20" height="15" class="lb-box"/>
+    <text x="40" y="132" class="component-text">Load Balancer</text>
+    
+    <rect x="10" y="140" width="20" height="15" class="server-box"/>
+    <text x="40" y="152" class="component-text">Application Servers</text>
+    
+    <rect x="10" y="160" width="20" height="15" class="monitor-box"/>
+    <text x="40" y="172" class="component-text">Monitoring Stack</text>
+    
+    <rect x="10" y="180" width="20" height="15" class="storage-box"/>
+    <text x="40" y="192" class="component-text">Infrastructure</text>
+  </g>
+  
+  <!-- Performance Metrics Box -->
+  <g transform="translate(850, 350)">
+    <rect x="0" y="0" width="250" height="120" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="5"/>
+    <text x="125" y="20" text-anchor="middle" class="component-title">Key Metrics</text>
+    
+    <text x="10" y="40" class="component-text">• Response Time: &lt; 100ms</text>
+    <text x="10" y="55" class="component-text">• Availability: 99.9%</text>
+    <text x="10" y="70" class="component-text">• Throughput: 1000 req/s</text>
+    <text x="10" y="85" class="component-text">• Health Check: 15s interval</text>
+    <text x="10" y="100" class="component-text">• Failover: &lt; 5s</text>
+  </g>
+  
+  <!-- Network Information -->
+  <g transform="translate(850, 490)">
+    <rect x="0" y="0" width="250" height="80" fill="#e8f4fd" stroke="#b3d9ff" stroke-width="1" rx="5"/>
+    <text x="125" y="20" text-anchor="middle" class="component-title">Network Configuration</text>
+    
+    <text x="10" y="40" class="component-text">• Load Balancer: 192.168.100.x</text>
+    <text x="10" y="55" class="component-text">• Algorithm: Round-Robin</text>
+    <text x="10" y="70" class="component-text">• Max Connections: 1 per server</text>
+  </g>
+</svg>

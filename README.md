@@ -349,6 +349,12 @@ chmod +x backup-fremisn.sh
 | **Safari** | 14+ |
 | **Edge** | 90+ |
 
+## 🏗️ Dokumentasi Arsitektur
+
+Untuk pemahaman mendalam tentang arsitektur sistem, silakan lihat:
+- **[Architecture Documentation](docs/ARCHITECTURE.md)** - Penjelasan detail komponen dan alur data
+- **[Architecture Topology Diagram](docs/architecture-topology.svg)** - Diagram visual arsitektur sistem
+
 ## 📁 Struktur Direktori Proyek
 
 ```
@@ -397,6 +403,8 @@ High-Availibility-Services/
     │   ├── prometheus/                 # Prometheus logs
     │   └── grafana/                    # Grafana logs
     └── docs/                           # Additional documentation
+        ├── ARCHITECTURE.md             # System architecture documentation
+        ├── architecture-topology.svg   # Architecture topology diagram
         ├── DEPLOYMENT.md               # Deployment guide
         ├── CONFIGURATION.md            # Configuration reference
         ├── TROUBLESHOOTING.md          # Troubleshooting guide
