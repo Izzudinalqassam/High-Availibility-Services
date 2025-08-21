@@ -1,0 +1,195 @@
+# High Availability Fremisn Services - Topology Diagram
+
+## Complete System Architecture
+
+```
+                                    CLIENT REQUESTS
+                                          |
+                                          v
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                        LOAD BALANCER LAYER                         │
+    │                                                                     │
+    │    ┌─────────────────────────────────────────────────────────┐     │
+    │    │              NGINX Load Balancer                       │     │
+    │    │            Container: fremisn-loadbalancer             │     │
+    │    │                   Port: 8081                           │     │
+    │    │                                                         │     │
+    │    │  Features:                                              │     │
+    │    │  • Round Robin Load Balancing                          │     │
+    │    │  • Rate Limiting (10 req/s, burst 20)                 │     │
+    │    │  • Health Checks                                       │     │
+    │    │  • Connection Limits (max 1 per backend)              │     │
+    │    └─────────────────────────────────────────────────────────┘     │
+    └─────────────────────────────────────────────────────────────────────┘
+                                          |
+                                          v
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                       APPLICATION LAYER                            │
+    │                                                                     │
+    │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐     │
+    │  │  Fremisn Master │  │ Fremisn Slave 1 │  │ Fremisn Slave 2 │     │
+    │  │                 │  │                 │  │                 │     │
+    │  │ 192.168.100.231 │  │ 192.168.100.18  │  │ 192.168.100.17  │     │
+    │  │    Port: 4005   │  │    Port: 4008   │  │    Port: 4009   │     │
+    │  │                 │  │                 │  │                 │     │
+    │  │ [External Svc]  │  │ [External Svc]  │  │ [External Svc]  │     │
+    │  └─────────────────┘  └─────────────────┘  └─────────────────┘     │
+    └─────────────────────────────────────────────────────────────────────┘
+                                          ^
+                                          |
+                                    HEALTH CHECKS
+                                          |
+                                          v
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                       MONITORING LAYER                             │
+    │                                                                     │
+    │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐     │
+    │  │   Prometheus    │  │     Grafana     │  │ Nginx Exporter  │     │
+    │  │                 │  │                 │  │                 │     │
+    │  │   Port: 9090    │  │   Port: 3000    │  │   Port: 9113    │     │
+    │  │                 │  │                 │  │                 │     │
+    │  │ • Metrics Store │  │ • Dashboards    │  │ • Nginx Metrics │     │
+    │  │ • Alerting      │  │ • Visualization │  │ • Performance   │     │
+    │  │ • 15s Interval  │  │ • Admin Access  │  │ • Status Data   │     │
+    │  └─────────────────┘  └─────────────────┘  └─────────────────┘     │
+    │                                                                     │
+    │  ┌─────────────────────────────────────────────────────────────┐   │
+    │  │                  Blackbox Exporter                         │   │
+    │  │                    Port: 9115                              │   │
+    │  │                                                             │   │
+    │  │  Health Check Targets:                                     │   │
+    │  │  • http://192.168.100.231:4005 → fremisn-master           │   │
+    │  │  • http://192.168.100.18:4008  → fremisn-slave-1          │   │
+    │  │  • http://192.168.100.17:4009  → fremisn-slave-2          │   │
+    │  │                                                             │   │
+    │  │  Features:                                                 │   │
+    │  │  • HTTP Probe                                              │   │
+    │  │  • Custom Module (fremisn_check)                          │   │
+    │  │  • Service Labeling                                       │   │
+    │  └─────────────────────────────────────────────────────────────┘   │
+    └─────────────────────────────────────────────────────────────────────┘
+```
+
+## Network Architecture
+
+```
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                     Docker Network: nf-visionaire                  │
+    │                            (External Bridge)                       │
+    │                                                                     │
+    │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
+    │  │ nginx-lb        │    │ prometheus      │    │ grafana         │ │
+    │  │ 8081:80         │    │ 9090:9090       │    │ 3000:3000       │ │
+    │  │ 8080:8080       │    │                 │    │                 │ │
+    │  └─────────────────┘    └─────────────────┘    └─────────────────┘ │
+    │                                                                     │
+    │  ┌─────────────────┐    ┌─────────────────────────────────────────┐ │
+    │  │ nginx-exporter  │    │        blackbox-exporter                │ │
+    │  │ 9113:9113       │    │           9115:9115                     │ │
+    │  └─────────────────┘    └─────────────────────────────────────────┘ │
+    └─────────────────────────────────────────────────────────────────────┘
+                                          |
+                                          | External Network
+                                          |
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                      External Fremisn Services                     │
+    │                                                                     │
+    │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐     │
+    │  │ 192.168.100.231 │  │ 192.168.100.18  │  │ 192.168.100.17  │     │
+    │  │    Port: 4005   │  │    Port: 4008   │  │    Port: 4009   │     │
+    │  │  (Master)       │  │  (Slave 1)      │  │  (Slave 2)      │     │
+    │  └─────────────────┘  └─────────────────┘  └─────────────────┘     │
+    └─────────────────────────────────────────────────────────────────────┘
+```
+
+## Data Flow Diagram
+
+```
+    CLIENT
+      |
+      | HTTP Request
+      v
+    NGINX LB (8081)
+      |
+      | Rate Limiting Check
+      | (10 req/s, burst 20)
+      |
+      v
+    UPSTREAM SELECTION
+    (Round Robin)
+      |
+      |-- Fremisn Master (192.168.100.231:4005)
+      |-- Fremisn Slave 1 (192.168.100.18:4008)
+      |-- Fremisn Slave 2 (192.168.100.17:4009)
+      |
+      | Max 1 connection per backend
+      | Timeout: 5s connect, 60s read/send
+      |
+      v
+    FREMISN SERVICE
+      |
+      | Response
+      v
+    CLIENT
+
+    ┌─────────────────────────────────────────────────────────────┐
+    │                    MONITORING FLOW                         │
+    │                                                             │
+    │  Blackbox Exporter ──→ HTTP Probes ──→ Fremisn Services    │
+    │         │                                      │            │
+    │         v                                      │            │
+    │  Prometheus ←──────── Metrics Collection ←─────┘            │
+    │         │                                                   │
+    │         │              Nginx Exporter ──→ Nginx Metrics    │
+    │         │                     │                             │
+    │         v                     v                             │
+    │  Grafana Dashboard ←─── Prometheus ←─────────────────────── │
+    │                                                             │
+    └─────────────────────────────────────────────────────────────┘
+```
+
+## Service Dependencies
+
+```
+    grafana
+      ↑
+      | depends_on
+      |
+    prometheus
+      ↑
+      | scrapes
+      |
+    ┌─────────────────┐    ┌─────────────────┐
+    │ nginx-exporter  │    │ blackbox-export │
+    │                 │    │                 │
+    │ depends_on      │    │ probes          │
+    │      ↓          │    │      ↓          │
+    │   nginx-lb      │    │ fremisn-services│
+    └─────────────────┘    └─────────────────┘
+```
+
+## Management Scripts Location
+
+```
+    scripts/
+    ├── setup.sh              # Initial system setup
+    ├── deploy.sh             # Deployment automation
+    ├── health-check.sh       # Health monitoring
+    ├── monitoring.sh         # System monitoring
+    ├── backup.sh             # Data backup
+    ├── test-loadbalancer.sh  # Load balancer testing
+    └── test-request-logging.sh # Request logging test
+```
+
+## Key Features Summary
+
+1. **High Availability**: 3 Fremisn instances (1 master + 2 slaves)
+2. **Load Balancing**: Nginx round-robin with connection limits
+3. **Rate Limiting**: 10 req/s with burst capacity of 20
+4. **Health Monitoring**: Blackbox exporter with custom probes
+5. **Metrics Collection**: Prometheus with 15s scrape interval
+6. **Visualization**: Grafana dashboards
+7. **Performance Monitoring**: Nginx exporter for LB metrics
+8. **Automated Management**: Comprehensive script collection
+9. **Docker Integration**: All services containerized
+10. **Network Isolation**: External Docker network (nf-visionaire)

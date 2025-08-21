@@ -349,11 +349,25 @@ chmod +x backup-fremisn.sh
 | **Safari** | 14+ |
 | **Edge** | 90+ |
 
-## 🏗️ Dokumentasi Arsitektur
+## 📚 Dokumentasi
 
-Untuk pemahaman mendalam tentang arsitektur sistem, silakan lihat:
+Untuk informasi lebih detail tentang arsitektur sistem:
+
 - **[Architecture Documentation](docs/ARCHITECTURE.md)** - Penjelasan detail komponen dan alur data
 - **[Architecture Topology Diagram](docs/architecture-topology.svg)** - Diagram visual arsitektur sistem
+- **[Service Topology Manual](docs/service-topology-manual.md)** - Dokumentasi topologi layanan manual
+- **[Topology Diagram](docs/topology-diagram.txt)** - Diagram topologi ASCII
+
+### 🔍 Topologi Service
+
+Sistem ini terdiri dari beberapa layer utama:
+
+1. **Load Balancer Layer** - Nginx dengan round-robin load balancing
+2. **Application Layer** - 3 Fremisn services (1 master + 2 slaves)
+3. **Monitoring Layer** - Prometheus, Grafana, dan Exporters
+4. **Network Layer** - Docker network dengan external bridge
+
+Lihat dokumentasi topologi untuk detail lengkap tentang alur data, konfigurasi jaringan, dan interaksi antar komponen.
 
 ## 📁 Struktur Direktori Proyek
 
