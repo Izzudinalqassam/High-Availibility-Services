@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Nginx exporter
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # Blackbox exporter for HTTP health checks
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [fremisn_check]  # Use custom module that accepts 404
+    static_configs:
+      - targets:
+        - http://192.168.100.231:4005   # Fremisn Master
+        - http://192.168.100.18:4008    # Fremisn Slave 
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115  # The blackbox exporter's real hostname:port.
+      - source_labels: [__param_target]
+        regex: 'http://192\.168\.100\.231:4005'
+        target_label: service
+        replacement: 'fremisn-master'
+      - source_labels: [__param_target]
+        regex: 'http://192\.168\.100\.18:4008'
+        target_label: service
+        replacement: 'fremisn-slave'
