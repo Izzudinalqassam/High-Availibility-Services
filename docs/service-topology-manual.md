@@ -167,6 +167,54 @@ Sistem dilengkapi dengan script management di `scripts/`:
 - `test-loadbalancer.sh` - Load balancer testing
 - `test-request-logging.sh` - Request logging test
 
+## Error Handling & Custom Pages
+
+### Custom Error Pages
+- **502.html**: Bad Gateway error page dengan desain modern
+- **50x.html**: Service Temporarily Unavailable error page
+- **Lokasi**: `/etc/nginx/html/` dalam container
+- **Fitur**: 
+  - Responsive design dengan gradient background
+  - Informasi detail error dan troubleshooting
+  - Styling modern dengan CSS3
+
+### Error Page Configuration
+```nginx
+error_page 500 501 502 503 504 /50x.html;
+error_page 502 /502.html;
+```
+
+## Performance Testing & Load Testing
+
+### Stress Testing Scripts
+
+#### 1. final-stress-test.sh
+- **Fungsi**: Comprehensive load balancer stress test untuk konfigurasi Nginx yang dioptimasi
+- **Target**: http://localhost:8081/health
+- **Konfigurasi**:
+  - 50 concurrent connections
+  - 500 requests per connection
+  - Duration: 30 seconds
+- **Tools**: Apache Bench (ab)
+
+#### 2. simple-stress-test.sh
+- **Fungsi**: Basic stress test untuk Fremisn Load Balancer
+- **Target**: http://localhost:8081/health
+- **Konfigurasi**:
+  - 20 concurrent connections
+  - 1000 requests per connection
+- **Tools**: Apache Bench (ab)
+
+#### 3. stress-test.sh
+- **Fungsi**: Comprehensive stress test untuk endpoint face enrollment
+- **Target**: http://localhost:8081/v1/face/enrollment
+- **Konfigurasi**:
+  - 10 concurrent users
+  - 100 requests per user
+  - Duration: 60 seconds
+  - JSON payload untuk face enrollment
+- **Tools**: Apache Bench (ab) dengan POST requests
+
 ## Kesimpulan
 
 Arsitektur ini menyediakan:
@@ -176,5 +224,7 @@ Arsitektur ini menyediakan:
 4. **Health Checking** otomatis untuk semua services
 5. **Rate Limiting** untuk protection
 6. **Easy Management** melalui Docker Compose dan scripts
+7. **Custom Error Handling** dengan responsive error pages
+8. **Performance Testing** dengan multiple stress testing scripts
 
 Sistem ini dirancang untuk production-ready dengan fokus pada reliability, monitoring, dan ease of management.

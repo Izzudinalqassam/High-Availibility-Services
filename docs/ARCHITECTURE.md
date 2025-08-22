@@ -37,21 +37,28 @@ Sistem High Availability Fremisn Services menggunakan arsitektur **multi-tier** 
 - **Port**: 
   - `8081` - Main load balancer endpoint
   - `8080` - Nginx status dan metrics
-- **Algoritma**: Round-Robin dengan max_conns=1
+- **Algoritma**: Round-Robin dengan failover
 - **Fitur**:
-  - **Health Checks**: Automatic detection server yang down
+  - **Enhanced Rate Limiting**: 50 requests/second + 100 burst capacity
+  - **Health Checks**: Automatic detection server yang down dengan custom error pages
   - **Session Persistence**: Sticky sessions jika diperlukan
-  - **Rate Limiting**: Protection dari traffic overload
   - **SSL Termination**: HTTPS support
   - **Compression**: Gzip compression untuk response
+  - **Proxy Buffering**: Enhanced buffering dan timeout configuration
+  - **Keepalive Connections**: Optimized connection pooling
 
 **Konfigurasi Upstream**:
 ```nginx
 upstream fremisn_backend {
-    server 192.168.100.231:4005 max_conns=1;  # Master
-    server 192.168.100.18:4008 max_conns=1;   # Slave 1
-    server 192.168.100.17:4009 max_conns=1;   # Slave 2
-    keepalive 32;
+    # Load balancing with health checks and failover
+    server 192.168.100.231:4005 max_fails=3 fail_timeout=30s weight=1;
+    server 192.168.100.18:4008 max_fails=3 fail_timeout=30s weight=1;
+    server 192.168.100.17:4009 max_fails=3 fail_timeout=30s weight=1 backup;
+    
+    # Keep alive connections for better performance
+    keepalive 64;
+    keepalive_requests 1000;
+    keepalive_timeout 60s;
 }
 ```
 
@@ -275,6 +282,51 @@ services:
 - **Action**: Restart monitoring services
 - **Recovery**: Data recovery dari persistent volumes
 - **Impact**: Loss of visibility, tidak affect application traffic
+
+## 📋 Performance Optimization & Error Handling
+
+### Performance Enhancements
+- **Enhanced Rate Limiting**: 
+  - Primary zone: 50 requests/second
+  - Burst zone: 100 requests/second
+  - Nodelay processing untuk high traffic
+- **Connection Optimization**:
+  - Keepalive connections: 64 concurrent
+  - Keepalive requests: 1000 per connection
+  - Keepalive timeout: 60 seconds
+- **Proxy Buffering**:
+  - Buffer size: 8k
+  - Buffer count: 16 buffers
+  - Busy buffers: 16k
+  - Temp file write: 64k
+- **Compression**: Gzip dengan level 6 untuk multiple content types
+- **Timeouts Optimization**:
+  - Connect timeout: 10s
+  - Send timeout: 120s
+  - Read timeout: 120s
+
+### Custom Error Handling
+- **502.html**: Bad Gateway error page
+  - Modern responsive design dengan gradient background
+  - Detailed error information dan troubleshooting steps
+  - CSS3 styling dengan shadow effects
+- **50x.html**: Service Temporarily Unavailable
+  - Professional error page dengan informative content
+  - Responsive design untuk mobile dan desktop
+  - User-friendly error messaging
+
+### Performance Testing Suite
+- **final-stress-test.sh**: Comprehensive load balancer testing
+  - 50 concurrent connections
+  - 500 requests per connection
+  - 30-second duration test
+- **simple-stress-test.sh**: Basic load testing
+  - 20 concurrent connections
+  - 1000 total requests
+- **stress-test.sh**: Face enrollment endpoint testing
+  - 10 concurrent users
+  - 100 requests per user
+  - JSON payload testing
 
 ## 📋 Maintenance Procedures
 

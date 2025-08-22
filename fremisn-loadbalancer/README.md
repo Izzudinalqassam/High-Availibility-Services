@@ -235,7 +235,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 Jika Anda mengalami masalah atau memiliki pertanyaan:
 
-- 📧 **Email**: izzudin.alqa@gmail.com
+- 📧 **Email**: support@fremisn.com
 - 🐛 **Bug Reports**: Buat issue di repository
 - 💬 **Discussions**: Gunakan GitHub Discussions
 - 📖 **Documentation**: Lihat wiki untuk detail teknis

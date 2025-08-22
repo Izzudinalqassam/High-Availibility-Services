@@ -15,10 +15,14 @@
     │    │                   Port: 8081                           │     │
     │    │                                                         │     │
     │    │  Features:                                              │     │
-    │    │  • Round Robin Load Balancing                          │     │
-    │    │  • Rate Limiting (10 req/s, burst 20)                 │     │
-    │    │  • Health Checks                                       │     │
-    │    │  • Connection Limits (max 1 per backend)              │     │
+    │    │  • Round Robin Load Balancing dengan failover          │     │
+    │    │  • Enhanced Rate Limiting (50 req/s + 100 req/s burst) │     │
+    │    │  • Health Checks (/health)                             │     │
+    │    │  • Nginx status monitoring (/nginx_status)             │     │
+    │    │  • Custom error pages (502.html, 50x.html)             │     │
+    │    │  • Gzip compression & keepalive optimization           │     │
+    │    │  • Enhanced proxy buffering & timeouts                 │     │
+    │    │  • Keepalive connections (64 connections)              │     │
     │    └─────────────────────────────────────────────────────────┘     │
     └─────────────────────────────────────────────────────────────────────┘
                                           |
@@ -181,11 +185,38 @@
     └── test-request-logging.sh # Request logging test
 ```
 
+## Testing & Error Handling
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                         TESTING & ERROR HANDLING                               │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │                        Stress Testing Scripts                          │    │
+│  │                                                                         │    │
+│  │  • final-stress-test.sh (50 concurrent, 500 req/conn, 30s)             │    │
+│  │  • simple-stress-test.sh (20 concurrent, 1000 requests)                 │    │
+│  │  • stress-test.sh (10 users, 100 req/user, face enrollment)            │    │
+│  │                                                                         │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │                        Custom Error Pages                              │    │
+│  │                                                                         │    │
+│  │  • 502.html - Bad Gateway (modern responsive design)                   │    │
+│  │  • 50x.html - Service Unavailable (gradient styling)                   │    │
+│  │  • Internal error page routing                                          │    │
+│  │                                                                         │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Key Features Summary
 
 1. **High Availability**: 3 Fremisn instances (1 master + 2 slaves)
 2. **Load Balancing**: Nginx round-robin with connection limits
-3. **Rate Limiting**: 10 req/s with burst capacity of 20
+3. **Enhanced Rate Limiting**: 50 req/s with burst capacity of 100
 4. **Health Monitoring**: Blackbox exporter with custom probes
 5. **Metrics Collection**: Prometheus with 15s scrape interval
 6. **Visualization**: Grafana dashboards
@@ -193,3 +224,5 @@
 8. **Automated Management**: Comprehensive script collection
 9. **Docker Integration**: All services containerized
 10. **Network Isolation**: External Docker network (nf-visionaire)
+11. **Stress Testing**: Multiple testing scripts for performance validation
+12. **Custom Error Handling**: Responsive error pages for better UX

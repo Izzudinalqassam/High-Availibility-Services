@@ -362,12 +362,32 @@ Untuk informasi lebih detail tentang arsitektur sistem:
 
 Sistem ini terdiri dari beberapa layer utama:
 
-1. **Load Balancer Layer** - Nginx dengan round-robin load balancing
-2. **Application Layer** - 3 Fremisn services (1 master + 2 slaves)
+1. **Load Balancer Layer** - Nginx dengan enhanced round-robin load balancing dan failover
+2. **Application Layer** - 3 Fremisn services (1 master + 2 slaves) dengan backup configuration
 3. **Monitoring Layer** - Prometheus, Grafana, dan Exporters
 4. **Network Layer** - Docker network dengan external bridge
+5. **Error Handling Layer** - Custom responsive error pages
+6. **Performance Testing Layer** - Multiple stress testing scripts
 
 Lihat dokumentasi topologi untuk detail lengkap tentang alur data, konfigurasi jaringan, dan interaksi antar komponen.
+
+## 🚀 Performance Features
+
+### Enhanced Load Balancing
+- **Rate Limiting**: 50 req/s + 100 req/s burst capacity
+- **Keepalive Connections**: 64 concurrent connections
+- **Failover**: Automatic backup server switching
+- **Health Checks**: Comprehensive monitoring dengan custom error pages
+
+### Stress Testing Suite
+- `final-stress-test.sh` - Comprehensive load balancer testing (50 concurrent, 500 req/conn)
+- `simple-stress-test.sh` - Basic load testing (20 concurrent, 1000 requests)
+- `stress-test.sh` - Face enrollment endpoint testing (10 users, 100 req/user)
+
+### Custom Error Handling
+- **502.html** - Modern Bad Gateway error page dengan responsive design
+- **50x.html** - Service Unavailable page dengan professional styling
+- **Internal Routing** - Secure error page handling
 
 ## 📁 Struktur Direktori Proyek
 
